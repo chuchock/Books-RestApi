@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Api Client</title>
+
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+</head>
+
+<body>
+
+	<table id="booksTable" class="table">
+		<thead>
+			<tr>
+				<td>Titulo</td>
+				<td>Id_autor</td>
+				<td>id_genero</td>
+			</tr>
+		</thead>
+		<tbody>
+		</tbody>
+	</table>
+
+	<input type="button" value="Cargar libros" id="loadBooks">
+
+	<div id="messages" class="" style="display: none;">
+		<p></p>
+	</div>
+
+	<div id="bookForm" style="display: none;">
+		<hr>
+		<table>
+			<tr>
+				<td>
+					Titulo:
+				</td>
+				<td>
+					<input type="text" id="bookTitle" name="bookTitle">
+				</td>
+			</tr>
+
+			<tr>
+				<td>
+					Id autor:
+				</td>
+				<td>
+					<input type="text" id="bookAuthorId" name="bookAuthorId">
+				</td>
+			</tr>
+
+			<tr>
+				<td>
+					Id genero:
+				</td>
+				<td>
+					<input type="text" id="bookGenreId" name="bookGenreId">
+				</td>
+			</tr>
+
+			<tr>
+				<td colspan="2">
+					<input type="button" value="Guardar" id="bookSave">
+				</td>
+			</tr>
+
+		</table>
+	</div>
+</body>
+
+<script src="https://code.jquery.com/jquery-3.4.1.js" integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU=" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript">
+	$('#loadBooks').click(function () {
+		$('#messages').first('p').text('Cargando libros...');
+		$('#messages').show();
+
+		$.ajax({
+			'url': 'http://localhost:82/platzi/Rest_api/php_api/server.php',
+			'success': function (response) {
+				console.log(response);
+				$('#messages').hide();
+				$('#booksTable > tbody').empty();
+
+				for (b in response) {
+					addBook(response[b]);
+				}
+
+				$('#bookForm').show();
+			},
+			error: function () {
+				alert("Error");
+			}
+		});
+	});
+
+	function addBook(book) {
+		$('#booksTable tr:last').after('<tr><td>' + book.title + '</td><td>' + book.id_autor + '</td><td>' + book.id_genero + '</td></tr>');
+	}
+
+	$('#bookSave').click(function () {
+		var newBook = {
+			'titulo': $('#bookTitle').val(),
+			'id_autor': $('#bookAuthorId').val(),
+			'id_genero': $('#bookGenreId').val()
+		};
+		$('#messages').first('p').text('Guardando libro...');
+		$('#messages').show();
+
+		$.ajax({
+			'url': 'http://localhost:8000/books',
+			'method': 'POST',
+			'data': JSON.stringify(newBook),
+			'success': function (data) {
+				$('#messages').hide();
+				addBook(newBook);
+			}
+		});
+	});
+</script>
+
+</html>
